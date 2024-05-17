@@ -1,47 +1,26 @@
 const connection = require('../config/connection');
-const { User, Thought, Reaction } = require('../models');
+const { User, Thought } = require('../models');
 
 connection.on('error', (err) => err);
 
 connection.once('open', async () => {
   console.log('connected');
-  // Delete the collections if they exist
-  let userCheck = await connection.db.listCollections({ name: 'users' }).toArray();
-  if (userCheck.length) {
-    await connection.dropCollection('users');
+  
+  // Drop existing collections if they exist
+  const collections = ['users', 'thoughts'];
+  for (const collection of collections) {
+    const collectionExists = await connection.db.listCollections({ name: collection }).toArray();
+    if (collectionExists.length) {
+      await connection.dropCollection(collection);
+    }
   }
 
-  let thoughtCheck = await connection.db.listCollections({ name: 'thoughts' }).toArray();
-  if (thoughtCheck.length) {
-    await connection.dropCollection('thoughts');
-  }
-
-  let reactionsCheck = await connection.db.listCollections({ name: 'reactions' }).toArray();
-  if (reactionsCheck.length) {
-    await connection.dropCollection('reactions');
-  }
-
-const users = [
-    {
-      username: "Nick",
-      email: "usernumber1@gmail.com",
-    },
-    {
-      username: "Win",
-      email: "usernumber2@gmail.com",
-    },
-    {
-      username: "Edwin",
-      email: "usernumber3@gmail.com",
-    },
-    {
-      username: "Tapia",
-      email: "usernumber4@gmail.com",
-    },
-    {
-      username: "burgerfan",
-      email: "usernumber5@gmail.com",
-    },
+  const users = [
+    { username: "annabobanna", email: "usernumber1@gmail.com" },
+    { username: "winnerwinner", email: "usernumber2@gmail.com" },
+    { username: "antisocial", email: "usernumber3@gmail.com" },
+    { username: "mynameisjeff", email: "usernumber4@gmail.com" },
+    { username: "burgerfan", email: "usernumber5@gmail.com" },
   ];
 
   const userData = await User.insertMany(users);
@@ -49,57 +28,50 @@ const users = [
   const thoughts = [
     {
       thoughtText: "I thought, therefore I... wait what",
-      username: [...userData.map(({ _id }) => _id)],
+      username: userData[0].username,
+      reactions: [
+        { reactionBody: "Interesting", username: userData[1].username },
+        { reactionBody: "Confusing", username: userData[2].username }
+      ]
     },
     {
       thoughtText: "IDK man",
-      username: [...userData.map(({ _id }) => _id)],
+      username: userData[1].username,
+      reactions: [
+        { reactionBody: "Same", username: userData[3].username },
+        { reactionBody: "Totally", username: userData[4].username }
+      ]
     },
     {
       thoughtText: "How can you expect me to use ANOTHER social account?",
-      username: [...userData.map(({ _id }) => _id)],
+      username: userData[2].username,
+      reactions: [
+        { reactionBody: "True", username: userData[0].username },
+        { reactionBody: "So many", username: userData[3].username }
+      ]
     },
     {
       thoughtText: "My name is Jeff",
-      username: [...userData.map(({ _id }) => _id)],
+      username: userData[3].username,
+      reactions: [
+        { reactionBody: "Hi Jeff", username: userData[1].username },
+        { reactionBody: "LOL", username: userData[4].username }
+      ]
     },
     {
       thoughtText: "But why?",
-      username: [...userData.map(({ _id }) => _id)],
+      username: userData[4].username,
+      reactions: [
+        { reactionBody: "Good question", username: userData[0].username },
+        { reactionBody: "No clue", username: userData[2].username }
+      ]
     },
   ];
 
   const thoughtData = await Thought.insertMany(thoughts);
 
-  const reactions = [
-    {
-      reactionBody: "Dumb",
-      username: [...userData.map(({ _id }) => _id)], 
-    },
-    {
-      reactionBody: "Smart",
-      username: [...userData.map(({ _id }) => _id)],
-    },
-    {
-      reactionBody: "Cool",
-      username: [...userData.map(({ _id }) => _id)],
-    },
-    {
-      reactionBody: "Lame",
-      username: [...userData.map(({ _id }) => _id)],
-    },
-    {
-      reactionBody: "Meh",
-      username: [...userData.map(({ _id }) => _id)],
-    },
-  ];
-
-  const reactionData = await Reaction.insertMany(reactions);
-
-  // Log out the seed data to indicate what should appear in the database
   console.table(users);
   console.table(thoughts);
-  console.table(reactions);
   console.info('Seeding complete! 🌱');
   process.exit(0);
 });
