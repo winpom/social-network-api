@@ -5,9 +5,9 @@ connection.on('error', (err) => err);
 
 connection.once('open', async () => {
   console.log('connected');
-  
+
   // Drop existing collections if they exist
-  const collections = ['users', 'thoughts'];
+  const collections = ['users', 'thoughts', 'reactions'];
   for (const collection of collections) {
     const collectionExists = await connection.db.listCollections({ name: collection }).toArray();
     if (collectionExists.length) {
@@ -67,9 +67,8 @@ connection.once('open', async () => {
       ]
     },
   ];
-
-  const thoughtData = await Thought.insertMany(thoughts);
-
+  
+  // Log out the seed data to indicate what should appear in the database
   console.table(users);
   console.table(thoughts);
   console.info('Seeding complete! 🌱');
