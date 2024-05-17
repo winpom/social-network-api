@@ -51,7 +51,7 @@ router.put('/:thoughtId', async (req, res) => {
   try {
     const thought = await Thought.findByIdAndUpdate(
       req.params.thoughtId,
-      req.body,
+      req.params,
       { new: true, runValidators: true }
     );
 

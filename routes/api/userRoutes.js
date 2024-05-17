@@ -4,7 +4,10 @@ const { User, Thought } = require('../../models');
 // Get all users
 router.get('/', async (req, res) => {
   try {
-    const users = await User.find().select('-__v');
+    const users = await User.find()
+      .populate('thoughts')
+      .populate('friends')
+      .select('-__v');
     res.json(users);
   } catch (err) {
     console.log(err);
@@ -15,7 +18,7 @@ router.get('/', async (req, res) => {
 // Get a single user by _id
 router.get('/:userId', async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId)
+    const user = await User.findById(req.body.userId)
       .populate('thoughts')
       .populate('friends')
       .select('-__v');
@@ -45,7 +48,7 @@ router.post('/', async (req, res) => {
 // Update a user by _id
 router.put('/:userId', async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.userId, req.body, {
+    const user = await User.findByIdAndUpdate(req.body.userId, req.body, {
       new: true,
       runValidators: true,
     });
@@ -64,7 +67,7 @@ router.put('/:userId', async (req, res) => {
 // Delete a user by _id
 router.delete('/:userId', async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.userId);
+    const user = await User.findByIdAndDelete(req.body.userId);
 
     if (!user) {
       return res.status(404).json({ message: 'No user with that ID' });
@@ -83,8 +86,8 @@ router.delete('/:userId', async (req, res) => {
 router.post('/:userId/friends/:friendId', async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { $addToSet: { friends: req.params.friendId } },
+      req.body.userId,
+      { $addToSet: { friends: req.body.friendId } },
       { new: true }
     );
 
@@ -103,8 +106,8 @@ router.post('/:userId/friends/:friendId', async (req, res) => {
 router.delete('/:userId/friends/:friendId', async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
-      req.params.userId,
-      { $pull: { friends: req.params.friendId } },
+      req.body.userId,
+      { $pull: { friends: req.body.friendId } },
       { new: true }
     );
 

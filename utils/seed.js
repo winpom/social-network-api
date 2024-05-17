@@ -68,9 +68,17 @@ connection.once('open', async () => {
     },
   ];
   
+  const thoughtData = await Thought.insertMany(thoughts);
+
+  await User.findOneAndUpdate({_id: userData[0]._id}, {$addToSet: {thoughts: thoughtData[0]._id}})
+  await User.findOneAndUpdate({_id: userData[1]._id}, {$addToSet: {thoughts: thoughtData[1]._id}})
+  await User.findOneAndUpdate({_id: userData[2]._id}, {$addToSet: {thoughts: thoughtData[2]._id}})
+  await User.findOneAndUpdate({_id: userData[3]._id}, {$addToSet: {thoughts: thoughtData[3]._id}})
+  await User.findOneAndUpdate({_id: userData[4]._id}, {$addToSet: {thoughts: thoughtData[4]._id}})
+
   // Log out the seed data to indicate what should appear in the database
-  console.table(users);
-  console.table(thoughts);
+  console.table(userData);
+  console.table(thoughtData);
   console.info('Seeding complete! 🌱');
   process.exit(0);
 });
