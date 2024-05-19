@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 // Get a single user by _id
 router.get('/:userId', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userId)
+    const user = await User.findById(req.params.userId)
       .populate('thoughts')
       .populate('friends')
       .select('-__v');
@@ -48,10 +48,10 @@ router.post('/', async (req, res) => {
 // Update a user by _id
 router.put('/:userId', async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.body.userId, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const user = await User.findByIdAndUpdate(
+      req.params.userId, 
+      req.body, 
+      {new: true, runValidators: true,});
 
     if (!user) {
       return res.status(404).json({ message: 'No user with that ID' });
@@ -67,7 +67,7 @@ router.put('/:userId', async (req, res) => {
 // Delete a user by _id
 router.delete('/:userId', async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.body.userId);
+    const user = await User.findByIdAndDelete(req.params.userId);
 
     if (!user) {
       return res.status(404).json({ message: 'No user with that ID' });
@@ -86,8 +86,8 @@ router.delete('/:userId', async (req, res) => {
 router.post('/:userId/friends/:friendId', async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
-      req.body.userId,
-      { $addToSet: { friends: req.body.friendId } },
+      req.params.userId,
+      { $addToSet: { friends: req.params.friendId } }, 
       { new: true }
     );
 
@@ -106,8 +106,8 @@ router.post('/:userId/friends/:friendId', async (req, res) => {
 router.delete('/:userId/friends/:friendId', async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
-      req.body.userId,
-      { $pull: { friends: req.body.friendId } },
+      req.params.userId,
+      { $pull: { friends: req.params.friendId } }, // Use req.params.friendId
       { new: true }
     );
 

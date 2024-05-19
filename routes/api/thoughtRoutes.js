@@ -51,7 +51,7 @@ router.put('/:thoughtId', async (req, res) => {
   try {
     const thought = await Thought.findByIdAndUpdate(
       req.params.thoughtId,
-      req.params,
+      req.body,
       { new: true, runValidators: true }
     );
 
@@ -69,15 +69,18 @@ router.put('/:thoughtId', async (req, res) => {
 // Delete a thought by _id
 router.delete('/:thoughtId', async (req, res) => {
   try {
+    // Find the thought by ID and delete it
     const thought = await Thought.findByIdAndDelete(req.params.thoughtId);
 
     if (!thought) {
       return res.status(404).json({ message: 'No thought with that ID' });
     }
 
+    // Update the user's thoughts array to remove the deleted thought
     await User.findByIdAndUpdate(
-      thought.username,
-      { $pull: { thoughts: req.params.thoughtId } }
+      thought.username, // Assuming thought.username is the user ID
+      { $pull: { thoughts: req.params.thoughtId } },
+      { new: true }
     );
 
     res.json({ message: 'Thought successfully deleted' });
@@ -86,6 +89,7 @@ router.delete('/:thoughtId', async (req, res) => {
     res.status(500).json(err);
   }
 });
+
 
 // Add a reaction to a thought
 router.post('/:thoughtId/reactions', async (req, res) => {
