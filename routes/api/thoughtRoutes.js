@@ -77,8 +77,8 @@ router.delete('/:thoughtId', async (req, res) => {
     }
 
     // Update the user's thoughts array to remove the deleted thought
-    await User.findByIdAndUpdate(
-      thought.username, // Assuming thought.username is the user ID
+    await User.findOneAndUpdate(
+      { username: thought.username },  // Find user by username
       { $pull: { thoughts: req.params.thoughtId } },
       { new: true }
     );
